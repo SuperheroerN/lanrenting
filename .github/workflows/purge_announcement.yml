@@ -1,0 +1,25 @@
+name: Purge announcement cache
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'announcement.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      # jsDelivr caches @main for up to 12 hours, which would keep returning the
+      # previous announcement. Purging makes a new edit visible on the next launch.
+      - name: Purge jsDelivr copies
+        run: |
+          for file in announcement.txt; do
+            echo "purging $file"
+            curl -fsS "https://purge.jsdelivr.net/gh/${{ github.repository }}@main/$file" || true
+            echo
+          done
