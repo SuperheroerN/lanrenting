@@ -39,3 +39,6 @@ testResults
 
 # local push error dumps (may contain credentials)
 push_err.txt
+
+# local agent workspace data
+/.workbuddy/
