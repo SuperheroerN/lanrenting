@@ -41,6 +41,7 @@ import voice.core.online.OnlineBookCacheManager
 import voice.core.playback.PlayerController
 import voice.core.ui.LocalSharedTransitionScope
 import voice.core.ui.VoiceTheme
+import voice.features.announcement.AnnouncementFeature
 import voice.features.review.ReviewFeature
 import voice.navigation.Destination
 import voice.navigation.NavigationCommand
@@ -191,6 +192,9 @@ class MainActivity : AppCompatActivity() {
         OnlineCacheMeteredPrompt(manager = onlineBookCacheManager)
 
         ReviewFeature()
+
+        // the announcement is fetched once per launch and shows on every screen
+        AnnouncementFeature()
       }
     }
   }

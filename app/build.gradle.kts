@@ -180,6 +180,7 @@ dependencies {
   implementation(projects.features.webdav)
   implementation(projects.features.onboarding)
   implementation(projects.features.bookmark)
+  implementation(projects.features.announcement)
   implementation(projects.features.widget)
 
   implementation(libs.appCompat)
