@@ -110,28 +110,28 @@ private fun Settings(
             )
           },
           supportingContent = {
-              val keyStatus = viewState.lrtsKeyStatus
-              val fresh = keyStatus.key == viewState.lrtsApiKey
-              Text(
-                text = when {
-                  viewState.lrtsApiKey.isBlank() ->
-                    stringResource(StringsR.string.settings_online_source_not_set)
-                  fresh && keyStatus.state == LrtsKeyStatus.STATE_OK ->
-                    if (keyStatus.expiresAt.isNotBlank()) {
-                      stringResource(StringsR.string.settings_lrts_key_expires, keyStatus.expiresAt)
-                    } else {
-                      // a valid but not-yet-activated key has no expiry yet; the server
-                      // message explains that the countdown starts on first use
-                      keyStatus.message
-                    }
-                  fresh && keyStatus.state == LrtsKeyStatus.STATE_INVALID ->
-                    stringResource(StringsR.string.settings_lrts_key_invalid)
-                  keyStatus.state == LrtsKeyStatus.STATE_ERROR && keyStatus.message.isNotBlank() ->
+            val keyStatus = viewState.lrtsKeyStatus
+            val fresh = keyStatus.key == viewState.lrtsApiKey
+            Text(
+              text = when {
+                viewState.lrtsApiKey.isBlank() ->
+                  stringResource(StringsR.string.settings_online_source_not_set)
+                fresh && keyStatus.state == LrtsKeyStatus.STATE_OK ->
+                  if (keyStatus.expiresAt.isNotBlank()) {
+                    stringResource(StringsR.string.settings_lrts_key_expires, keyStatus.expiresAt)
+                  } else {
+                    // a valid but not-yet-activated key has no expiry yet; the server
+                    // message explains that the countdown starts on first use
                     keyStatus.message
-                  else -> "••••••••"
-                },
-              )
-            },
+                  }
+                fresh && keyStatus.state == LrtsKeyStatus.STATE_INVALID ->
+                  stringResource(StringsR.string.settings_lrts_key_invalid)
+                keyStatus.state == LrtsKeyStatus.STATE_ERROR && keyStatus.message.isNotBlank() ->
+                  keyStatus.message
+                else -> "••••••••"
+              },
+            )
+          },
         ) {
           Text(stringResource(StringsR.string.settings_lrts_key_title))
         }

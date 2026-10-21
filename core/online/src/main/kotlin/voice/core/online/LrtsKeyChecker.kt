@@ -1,9 +1,9 @@
 package voice.core.online
 
 import androidx.datastore.core.DataStore
+import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.Inject
 import dev.zacsweers.metro.SingleIn
-import dev.zacsweers.metro.AppScope
 import kotlinx.coroutines.flow.first
 
 /**

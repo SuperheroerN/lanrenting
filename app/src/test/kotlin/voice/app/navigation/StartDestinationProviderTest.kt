@@ -53,9 +53,7 @@ class StartDestinationProviderTest {
     assertTrue(result.shouldPlayCurrent)
   }
 
-  private fun provider(
-    currentBook: BookId? = null,
-  ): StartDestinationProvider {
+  private fun provider(currentBook: BookId? = null): StartDestinationProvider {
     return StartDestinationProvider(
       currentBookStore = MemoryDataStore(currentBook),
     )
