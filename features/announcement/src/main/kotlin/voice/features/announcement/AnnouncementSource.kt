@@ -30,21 +30,23 @@ class RemoteAnnouncementSource(private val client: OkHttpClient = defaultClient(
   companion object {
 
     /**
-     * jsDelivr mirrors the repository content and is reachable where
-     * raw.githubusercontent.com is not; the latter stays as a last resort.
+     * raw.githubusercontent.com serves the file immediately, which is what the
+     * "edit the file, see it again" promise needs. The jsDelivr mirrors cache
+     * `@main` for hours, so they are only a fallback for networks where GitHub
+     * is unreachable - there a stale announcement is better than none.
      */
     private val urls = listOf(
-      "https://cdn.jsdelivr.net/gh/SuperheroerN/lanrenting@main/announcement.txt",
-      "https://fastly.jsdelivr.net/gh/SuperheroerN/lanrenting@main/announcement.txt",
       "https://raw.githubusercontent.com/SuperheroerN/lanrenting/main/announcement.txt",
+      "https://fastly.jsdelivr.net/gh/SuperheroerN/lanrenting@main/announcement.txt",
+      "https://cdn.jsdelivr.net/gh/SuperheroerN/lanrenting@main/announcement.txt",
     )
 
     /** The announcement is a few hundred bytes, so a short timeout is enough. */
     fun defaultClient(): OkHttpClient {
       return OkHttpClient.Builder()
-        .connectTimeout(8, TimeUnit.SECONDS)
-        .readTimeout(8, TimeUnit.SECONDS)
-        .callTimeout(12, TimeUnit.SECONDS)
+        .connectTimeout(5, TimeUnit.SECONDS)
+        .readTimeout(5, TimeUnit.SECONDS)
+        .callTimeout(8, TimeUnit.SECONDS)
         .build()
     }
   }
