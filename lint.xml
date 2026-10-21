@@ -13,7 +13,14 @@
   <issue id="RestrictedApi" severity="informational" />
   <issue id="VectorRaster" severity="ignore" />
   <issue id="VectorPath" severity="informational" />
-  <issue id="UnusedResources" severity="error" />
+  <issue id="UnusedResources" severity="error">
+    <!--
+      Stock from features that are not wired up yet (the update check and parts
+      of the folder picker). Drop an entry once the string is used or deleted,
+      so genuinely unused resources still fail the build.
+    -->
+    <ignore regexp="R\.(drawable|string)\.(folder_type_artwork|folder_add_title_default|folder_add_title_onboarding|folder_add_type_subtitle|settings_about_app_version_title|settings_github_title|settings_library_folders_summary|settings_source_share_title|update_dialog_title|update_dialog_message|update_dialog_confirm|update_dialog_notes_title|settings_about_app_version_update_available|webdav_settings_summary|folder_add_type_webdav)" />
+  </issue>
   <!-- renovate takes care of this -->
   <issue id="NewerVersionAvailable" severity="informational" />
   <!-- renovate takes care of this -->

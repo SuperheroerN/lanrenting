@@ -343,6 +343,6 @@ public class LrtsOnlineSource(
     private const val PAGE_SIZE = 50
     private const val CONCURRENCY = 5
     private const val MAX_PAGE = 300
-    private const val BOM = "﻿"
+    private const val BOM = "\uFEFF"
   }
 }
