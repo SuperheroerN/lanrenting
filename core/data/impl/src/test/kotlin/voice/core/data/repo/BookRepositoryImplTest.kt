@@ -1,0 +1,153 @@
+package voice.core.data.repo
+
+import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
+import org.junit.runner.RunWith
+import voice.core.data.BookContent
+import voice.core.data.BookId
+import voice.core.data.Chapter
+import voice.core.data.ChapterId
+import voice.core.data.MarkData
+import voice.core.data.PlaybackPosition
+import voice.core.data.repo.internals.AppDb
+import java.io.Closeable
+import java.time.Instant
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
+
+@RunWith(AndroidJUnit4::class)
+class BookRepositoryImplTest {
+
+  private fun test(test: suspend TestEnvironment.() -> Unit) {
+    runTest {
+      TestEnvironment().use { test(it) }
+    }
+  }
+
+  @Test
+  fun libraryFlowShowsFreshPositions() = test {
+    val bookId = BookId("book")
+    val chapterId = ChapterId("chapter")
+    putBook(bookId, chapterId, positionInChapter = 1000)
+
+    val initialBook = repo.flow().first().single()
+    assertEquals(expected = 1000, actual = initialBook.content.positionInChapter)
+
+    repo.updatePlaybackPosition(
+      id = bookId,
+      currentChapter = chapterId,
+      positionInChapter = 60_000,
+      persist = false,
+    )
+
+    // the position reaches the live observers through its own flow: the book
+    // list and every book in it stay untouched, so a tick no longer
+    // re-assembles the library at playback frequency
+    assertEquals(
+      expected = PlaybackPosition(chapterId = chapterId, positionInChapter = 60_000),
+      actual = repo.positionFlow(bookId).first(),
+    )
+    val bookAfterPositionUpdate = repo.flow().first().single()
+    assertEquals(expected = 1000, actual = bookAfterPositionUpdate.content.positionInChapter)
+
+    // the same book instance is reused as long as nothing changed at all, so
+    // re-subscribing the flow does not re-assemble the library
+    val reCollectedBook = repo.flow().first().single()
+    assertSame(bookAfterPositionUpdate, reCollectedBook)
+
+    // persisting catches the stored content up
+    repo.updatePlaybackPosition(
+      id = bookId,
+      currentChapter = chapterId,
+      positionInChapter = 60_000,
+      persist = true,
+    )
+    assertEquals(
+      expected = 60_000,
+      actual = repo.flow().first().single().content.positionInChapter,
+    )
+  }
+
+  @Test
+  fun libraryFlowReassemblesTheBookWhenTheChaptersChange() = test {
+    val bookId = BookId("book")
+    val chapterId = ChapterId("chapter")
+    putBook(bookId, chapterId, positionInChapter = 1000)
+
+    val initialBook = repo.flow().first().single()
+    assertEquals(expected = 42_000, actual = initialBook.chapters.single().duration)
+
+    chapterRepo.put(
+      Chapter(
+        id = chapterId,
+        name = "Chapter",
+        duration = 43_000,
+        fileLastModified = Instant.ofEpochMilli(1),
+        fileSize = 1,
+        markData = listOf(MarkData(startMs = 0, name = "Chapter")),
+      ),
+    )
+
+    val updatedBook = repo.flow().first().single()
+    assertEquals(expected = 43_000, actual = updatedBook.chapters.single().duration)
+    assertTrue(initialBook !== updatedBook)
+  }
+
+  private class TestEnvironment : Closeable {
+
+    private val db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), AppDb::class.java)
+      .allowMainThreadQueries()
+      .build()
+    private val contentRepo = BookContentRepoImpl(db.bookContentDao())
+    val chapterRepo = ChapterRepoImpl(db.chapterDao())
+    val repo = BookRepositoryImpl(chapterRepo, contentRepo)
+
+    suspend fun putBook(
+      bookId: BookId,
+      chapterId: ChapterId,
+      positionInChapter: Long,
+    ) {
+      chapterRepo.put(
+        Chapter(
+          id = chapterId,
+          name = "Chapter",
+          duration = 42_000,
+          fileLastModified = Instant.ofEpochMilli(1),
+          fileSize = 1,
+          markData = listOf(MarkData(startMs = 0, name = "Chapter")),
+        ),
+      )
+      contentRepo.put(
+        BookContent(
+          id = bookId,
+          playbackSpeed = 1F,
+          skipSilence = false,
+          isActive = true,
+          lastPlayedAt = Instant.ofEpochMilli(1),
+          author = null,
+          name = "Book",
+          addedAt = Instant.ofEpochMilli(1),
+          chapters = listOf(chapterId),
+          currentChapter = chapterId,
+          positionInChapter = positionInChapter,
+          cover = null,
+          gain = 1F,
+          genre = null,
+          narrator = null,
+          series = null,
+          part = null,
+        ),
+        persist = true,
+      )
+    }
+
+    override fun close() {
+      db.close()
+    }
+  }
+}

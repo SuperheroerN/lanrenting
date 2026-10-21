@@ -1,0 +1,74 @@
+package voice.features.settings
+
+import voice.core.data.ThemeColorScheme
+import voice.core.data.ThemeMode
+import java.time.LocalTime
+
+interface SettingsListener {
+  fun close()
+  fun onThemeModeRowClick()
+  fun onThemeColorSchemeRowClick()
+  fun setThemeMode(themeMode: ThemeMode)
+  fun setThemeColorScheme(themeColorScheme: ThemeColorScheme)
+  fun toggleGrid()
+  fun seekAmountChanged(seconds: Int)
+  fun onSeekAmountRowClick()
+  fun autoRewindAmountChang(seconds: Int)
+  fun onAutoRewindRowClick()
+  fun dismissDialog()
+  fun openSupportVoice()
+  fun setAutoSleepTimer(checked: Boolean)
+  fun setAutoSleepTimerStart(time: LocalTime)
+  fun setAutoSleepTimerEnd(time: LocalTime)
+  fun toggleAnalytics()
+  fun setLrtsApiKey(value: String)
+  fun onLrtsApiKeyRowClick()
+  fun restartApp()
+  fun setAutoRefreshWifi(checked: Boolean)
+  fun setBtSkipToChapter(checked: Boolean)
+  fun onImportParallelismRowClick()
+  fun importParallelismChanged(level: Int)
+  fun setOnlineSourceEnabled(checked: Boolean)
+  fun onOnlineSourceBaseUrlRowClick()
+  fun onOnlineSourceCredentialRowClick()
+  fun onlineSourceBaseUrlChanged(value: String)
+  fun onlineSourceCredentialChanged(value: String)
+  fun openPlayerSettings()
+
+  fun openDeveloperMenu()
+
+  companion object {
+    fun noop() = object : SettingsListener {
+      override fun close() {}
+      override fun onThemeModeRowClick() {}
+      override fun onThemeColorSchemeRowClick() {}
+      override fun setThemeMode(themeMode: ThemeMode) {}
+      override fun setThemeColorScheme(themeColorScheme: ThemeColorScheme) {}
+      override fun toggleGrid() {}
+      override fun seekAmountChanged(seconds: Int) {}
+      override fun onSeekAmountRowClick() {}
+      override fun autoRewindAmountChang(seconds: Int) {}
+      override fun onAutoRewindRowClick() {}
+      override fun setBtSkipToChapter(checked: Boolean) {}
+      override fun onImportParallelismRowClick() {}
+      override fun importParallelismChanged(level: Int) {}
+      override fun setOnlineSourceEnabled(checked: Boolean) {}
+      override fun onOnlineSourceBaseUrlRowClick() {}
+      override fun onOnlineSourceCredentialRowClick() {}
+      override fun onlineSourceBaseUrlChanged(value: String) {}
+      override fun onlineSourceCredentialChanged(value: String) {}
+      override fun openPlayerSettings() {}
+      override fun dismissDialog() {}
+      override fun openSupportVoice() {}
+      override fun setAutoSleepTimer(checked: Boolean) {}
+      override fun setAutoSleepTimerStart(time: LocalTime) {}
+      override fun setAutoSleepTimerEnd(time: LocalTime) {}
+      override fun toggleAnalytics() {}
+      override fun setLrtsApiKey(value: String) {}
+      override fun onLrtsApiKeyRowClick() {}
+      override fun restartApp() {}
+      override fun setAutoRefreshWifi(checked: Boolean) {}
+      override fun openDeveloperMenu() {}
+    }
+  }
+}
